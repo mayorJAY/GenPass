@@ -1,12 +1,20 @@
 package com.josycom.mayorjay.genpass.home.generate
 
+import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
+import com.josycom.mayorjay.genpass.data.PasswordData
 import com.josycom.mayorjay.genpass.data.getPasswordCharacters
 import com.josycom.mayorjay.genpass.data.getPasswordDisplayTexts
+import com.josycom.mayorjay.genpass.persistence.PreferenceManager
+import com.josycom.mayorjay.genpass.persistence.dataStore
 import com.josycom.mayorjay.genpass.util.Constants
+import kotlinx.coroutines.launch
 import org.apache.commons.lang3.StringUtils
 import java.security.SecureRandom
+import java.util.*
 
 class GeneratePasswordViewModel : ViewModel() {
 
@@ -25,8 +33,8 @@ class GeneratePasswordViewModel : ViewModel() {
             return "Password Length cannot be blank"
         }
 
-        if (passwordLength.value?.toInt() ?: 0 < 15 || passwordLength.value?.toInt() ?: 0 > 64) {
-            return "Please input a value between 15 and 64"
+        if (passwordLength.value?.toInt() ?: 0 < 16 || passwordLength.value?.toInt() ?: 0 > 64) {
+            return "Please input a value between 16 and 64"
         }
         return StringUtils.EMPTY
     }
@@ -41,5 +49,27 @@ class GeneratePasswordViewModel : ViewModel() {
             buffer.append(characters[index.toInt()])
         }
         return buffer.toString()
+    }
+
+    fun processAndCachePassword(context: Context, passwordData: PasswordData) {
+        val queue: Queue<String> = LinkedList()
+        val dataStore = PreferenceManager(context.dataStore)
+        for (i in 1..10) {
+            val password = dataStore.getPasswordPrefFlow(i).asLiveData().value
+            if (password != null && StringUtils.isNotBlank(password)) {
+                queue.add(password)
+            }
+        }
+
+        if (queue.size == 10) {
+            queue.remove()
+        }
+        queue.add("${passwordData.password}-${passwordData.timeGenerated}")
+
+        for (item in queue) {
+            viewModelScope.launch {
+                dataStore.setPasswordPref(item, queue.indexOf(item).plus(1))
+            }
+        }
     }
 }

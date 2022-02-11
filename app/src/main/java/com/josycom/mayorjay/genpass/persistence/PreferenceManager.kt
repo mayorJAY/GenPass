@@ -2,10 +2,7 @@ package com.josycom.mayorjay.genpass.persistence
 
 import android.content.Context
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.emptyPreferences
+import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -66,5 +63,15 @@ class PreferenceManager(private val dataStore: DataStore<Preferences>) {
 
     suspend fun setFirstLaunchPref(value: Boolean) {
         setBooleanPreference(isFirstLaunchPref, value)
+    }
+
+    fun getPasswordPrefFlow(suffix: Int): Flow<String> {
+        val passwordPref = stringPreferencesKey("password$suffix")
+        return getStringPreferenceFlow(passwordPref)
+    }
+
+    suspend fun setPasswordPref(value: String, suffix: Int) {
+        val passwordPref = stringPreferencesKey("password$suffix")
+        setStringPreference(passwordPref, value)
     }
 }

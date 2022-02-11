@@ -11,6 +11,7 @@ import android.widget.ArrayAdapter
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.josycom.mayorjay.genpass.data.PasswordData
 import com.josycom.mayorjay.genpass.databinding.FragmentGeneratePasswordBinding
 import com.josycom.mayorjay.genpass.util.Utilities
 import org.apache.commons.lang3.StringUtils
@@ -53,7 +54,7 @@ class GeneratePasswordFragment : Fragment() {
     }
 
     private fun setupListeners() {
-        binding.spPasswordType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+        binding.spPasswordType.onItemSelectedListener = object: AdapterView.OnItemSelectedListener{
             override fun onItemSelected(adapterView: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 viewModel.passwordType.value = adapterView?.getItemAtPosition(position).toString()
             }
@@ -75,23 +76,26 @@ class GeneratePasswordFragment : Fragment() {
         })
 
         binding.btGenerate.setOnClickListener {
+            viewModel.password.value = StringUtils.EMPTY
             val message = viewModel.validateInputs()
-            if (StringUtils.isBlank(message)) {
-                viewModel.password.value = ""
-                val password = viewModel.generatePassword(viewModel.passwordType.value!!, viewModel.passwordLength.value?.toInt() ?: 0)
-                viewModel.password.value = password
-            } else {
+            if (StringUtils.isNotBlank(message)) {
                 Utilities.showToast(message, requireContext())
+                return@setOnClickListener
             }
+            val password = viewModel.generatePassword(viewModel.passwordType.value ?: StringUtils.EMPTY, viewModel.passwordLength.value?.toInt() ?: 0)
+            viewModel.password.value = password
+            val time = System.currentTimeMillis().toString()
+            val passwordData = PasswordData(password, time)
+            viewModel.processAndCachePassword(requireContext(), passwordData)
         }
 
         binding.ivCopy.setOnClickListener {
-            Utilities.copyContentToClipboard(viewModel.password.value!!, requireContext())
+            Utilities.copyContentToClipboard(viewModel.password.value ?: StringUtils.EMPTY, requireContext())
             Utilities.showToast("Password copied", requireContext())
         }
 
         binding.ivShare.setOnClickListener {
-            Utilities.shareContent(viewModel.password.value!!, requireContext())
+            Utilities.shareContent(viewModel.password.value ?: StringUtils.EMPTY, requireContext())
         }
     }
 }

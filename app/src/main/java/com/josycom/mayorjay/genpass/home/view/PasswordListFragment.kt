@@ -1,4 +1,4 @@
-package com.josycom.mayorjay.genpass.home
+package com.josycom.mayorjay.genpass.home.view
 
 import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
@@ -8,20 +8,20 @@ import android.view.View
 import android.view.ViewGroup
 import com.josycom.mayorjay.genpass.R
 
-class ListFragment : Fragment() {
+class PasswordListFragment : Fragment() {
 
-    private lateinit var viewModel: ListViewModel
+    private lateinit var viewModelPassword: PasswordListViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.list_fragment, container, false)
+        return inflater.inflate(R.layout.fragment_password_list, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProviders.of(this).get(ListViewModel::class.java)
+        viewModelPassword = ViewModelProviders.of(this).get(PasswordListViewModel::class.java)
     }
 
 }

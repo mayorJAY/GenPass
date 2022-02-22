@@ -3,7 +3,6 @@ package com.josycom.mayorjay.genpass.home.generate
 import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.josycom.mayorjay.genpass.data.PasswordData
 import com.josycom.mayorjay.genpass.data.getPasswordCharacters
@@ -14,13 +13,15 @@ import com.josycom.mayorjay.genpass.util.Constants
 import kotlinx.coroutines.launch
 import org.apache.commons.lang3.StringUtils
 import java.security.SecureRandom
-import java.util.*
+import java.util.LinkedList
+import java.util.Queue
 
 class GeneratePasswordViewModel : ViewModel() {
 
-     val passwordType = MutableLiveData<String>()
-     val passwordLength = MutableLiveData<String>()
-     val password = MutableLiveData<String>()
+    val passwordType = MutableLiveData<String>()
+    val passwordLength = MutableLiveData<String>()
+    val password = MutableLiveData<String>()
+    val queue: Queue<PasswordData> = LinkedList()
 
     fun getPasswordTypes(): MutableList<String> = getPasswordDisplayTexts()
 
@@ -51,24 +52,15 @@ class GeneratePasswordViewModel : ViewModel() {
         return buffer.toString()
     }
 
-    fun processAndCachePassword(context: Context, passwordData: PasswordData) {
-        val queue: Queue<String> = LinkedList()
+    fun cachePassword(context: Context, passwordData: PasswordData) {
         val dataStore = PreferenceManager(context.dataStore)
-        for (i in 1..10) {
-            val password = dataStore.getPasswordPrefFlow(i).asLiveData().value
-            if (password != null && StringUtils.isNotBlank(password)) {
-                queue.add(password)
-            }
-        }
-
-        if (queue.size == 10) {
+        if (queue.size >= 10) {
             queue.remove()
         }
-        queue.add("${passwordData.password}-${passwordData.timeGenerated}")
-
+        queue.add(passwordData)
         for (item in queue) {
             viewModelScope.launch {
-                dataStore.setPasswordPref(item, queue.indexOf(item).plus(1))
+                dataStore.setPasswordPref(item.key, "${item.password}-${item.timeGenerated}")
             }
         }
     }

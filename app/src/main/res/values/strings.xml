@@ -3,4 +3,11 @@
     <string name="tab_text_1">Tab 1</string>
     <string name="tab_text_2">Tab 2</string>
     <string name="title_activity_onboarding">OnboardingActivity</string>
+    <string name="proceed">Proceed</string>
+    <string name="onboard_1_heading">Secure Password Generator</string>
+    <string name="onboard_2_heading">Be more security Conscious</string>
+    <string name="onboard_3_heading">Leave the job to GenPass</string>
+    <string name="onboard_1_info">Generate very secure passwords needed for any account creation</string>
+    <string name="onboard_2_info">Never use the same password for multiple accounts</string>
+    <string name="onboard_3_info">You don’t have to rack your brain for password combinations anymore</string>
 </resources>

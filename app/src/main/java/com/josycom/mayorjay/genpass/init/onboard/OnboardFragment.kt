@@ -4,55 +4,53 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
-import com.josycom.mayorjay.genpass.R
+import androidx.fragment.app.viewModels
+import com.josycom.mayorjay.genpass.data.OnboardData
+import com.josycom.mayorjay.genpass.databinding.FragmentOnboardBinding
 
-/**
- * A placeholder fragment containing a simple view.
- */
 class OnboardFragment : Fragment() {
 
-    private lateinit var onboardViewModel: OnboardViewModel
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        onboardViewModel = ViewModelProviders.of(this).get(OnboardViewModel::class.java).apply {
-            setIndex(arguments?.getInt(ARG_SECTION_NUMBER) ?: 1)
-        }
-    }
+    private val viewModel: OnboardViewModel by viewModels()
+    private lateinit var binding: FragmentOnboardBinding
+    private var onboardData: OnboardData? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        val root = inflater.inflate(R.layout.fragment_onboard, container, false)
-        val textView: TextView = root.findViewById(R.id.section_label)
-        onboardViewModel.text.observe(viewLifecycleOwner, Observer<String> {
-            textView.text = it
+    ): View {
+        binding = FragmentOnboardBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        setOnboardData()
+        observeOnboardData()
+    }
+
+    private fun observeOnboardData() {
+        viewModel.onboardData.observe(viewLifecycleOwner, { data ->
+            binding.apply {
+                ivOnboard.setImageDrawable(resources.getDrawable(data.image, null))
+                tvHeading.text = data.header
+                tvInfo.text = data.info
+            }
         })
-        return root
+    }
+
+    private fun setOnboardData() {
+        if (onboardData != null) {
+            viewModel.setOnboardData(onboardData!!)
+        }
     }
 
     companion object {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private const val ARG_SECTION_NUMBER = "section_number"
-
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
         @JvmStatic
-        fun newInstance(sectionNumber: Int): OnboardFragment {
+        fun newInstance(onboardData: OnboardData): OnboardFragment {
             return OnboardFragment().apply {
-                arguments = Bundle().apply {
-                    putInt(ARG_SECTION_NUMBER, sectionNumber)
-                }
+                this.onboardData = onboardData
             }
         }
     }

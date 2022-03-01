@@ -36,7 +36,6 @@ class GeneratePasswordFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-//        viewModel = ViewModelProvider(this)[GeneratePasswordViewModel::class.java]
 
         preferenceManager = PreferenceManager(requireContext().dataStore)
 

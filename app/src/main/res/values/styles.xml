@@ -38,4 +38,16 @@
         <item name="android:windowContentOverlay">@null</item>
     </style>
 
+    <style name="Widget.GenPass.TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="hintTextAppearance">@style/TextAppearance.GenPass.TextInputLayout.HintText</item>
+        <item name="hintTextColor">@color/colorAsh</item>
+        <item name="android:paddingBottom">@dimen/_8sdp</item>
+        <item name="boxStrokeColor">@color/colorAccent</item>
+        <item name="boxStrokeWidth">@dimen/_1sdp</item>
+    </style>
+
+    <style name="TextAppearance.GenPass.TextInputLayout.HintText" parent="TextAppearance.MaterialComponents.Subtitle2">
+        <item name="android:textColor">@color/colorAsh</item>
+    </style>
+
 </resources>

@@ -30,7 +30,7 @@ class SplashActivity : AppCompatActivity() {
             isFirstLaunch = value
         })
         val handler = Handler(Looper.getMainLooper())
-        handler.postDelayed({ proceedToNextView() }, 1000)
+        handler.postDelayed({ proceedToNextView() }, 1500)
     }
 
     private fun proceedToNextView() {

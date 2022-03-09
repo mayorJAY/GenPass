@@ -11,8 +11,8 @@ import android.widget.ArrayAdapter
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
+import com.josycom.mayorjay.genpass.R
 import com.josycom.mayorjay.genpass.data.PasswordData
 import com.josycom.mayorjay.genpass.databinding.FragmentGeneratePasswordBinding
 import com.josycom.mayorjay.genpass.persistence.PreferenceManager
@@ -20,15 +20,17 @@ import com.josycom.mayorjay.genpass.persistence.dataStore
 import com.josycom.mayorjay.genpass.util.Utilities
 import org.apache.commons.lang3.StringUtils
 
+
 class GeneratePasswordFragment : Fragment() {
 
     private val viewModel: GeneratePasswordViewModel by viewModels()
     private lateinit var binding: FragmentGeneratePasswordBinding
     private var preferenceManager: PreferenceManager? = null
+    private var queueList = listOf<PasswordData>()
 
     override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View {
         binding = FragmentGeneratePasswordBinding.inflate(inflater, container, false)
         return binding.root
@@ -38,24 +40,35 @@ class GeneratePasswordFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         preferenceManager = PreferenceManager(requireContext().dataStore)
-
-        for (key in preferenceManager!!.list) {
-            preferenceManager!!.getPasswordPrefFlow(key).asLiveData().observe(viewLifecycleOwner, { value ->
-                val queueList = viewModel.queue.toList()
-                val passList = mutableListOf<String>()
-                for (item in queueList) {
-                    passList.add("${item.password}-${item.timeGenerated}")
-                }
-                if (value != null && StringUtils.isNotBlank(value) && !passList.contains(value)) {
-                    viewModel.queue.add(PasswordData(key, value.substringBefore("-"), value.substringAfter("-").toLong()))
-                }
-            })
-        }
+        observePasswordPref()
         setupSpinnerAdapter()
         setupListeners()
-        observePassword()
+        observeGeneratedPassword()
         //Todo: Implement update installer
         //Todo: Implement app review prompt
+    }
+
+    private fun observePasswordPref() {
+        for (key in preferenceManager!!.list) {
+            preferenceManager!!.getPasswordPrefFlow(key).asLiveData().observe(
+                viewLifecycleOwner,
+                { value ->
+                    queueList = viewModel.queue.toList()
+                    val passList = mutableListOf<String>()
+                    for (item in queueList) {
+                        passList.add("${item.password}-${item.timeGenerated}")
+                    }
+                    if (value != null && StringUtils.isNotBlank(value) && !passList.contains(value)) {
+                        viewModel.queue.add(
+                            PasswordData(
+                                key, value.substringBefore("-"), value.substringAfter(
+                                    "-"
+                                ).toLong()
+                            )
+                        )
+                    }
+                })
+        }
     }
 
     private fun setupSpinnerAdapter() {
@@ -65,7 +78,7 @@ class GeneratePasswordFragment : Fragment() {
         }
     }
 
-    private fun observePassword() {
+    private fun observeGeneratedPassword() {
         viewModel.password.observe(viewLifecycleOwner, { value ->
             binding.tvPassword.text = value
             binding.ivCopy.isVisible = StringUtils.isNotBlank(value)
@@ -75,7 +88,12 @@ class GeneratePasswordFragment : Fragment() {
 
     private fun setupListeners() {
         binding.spPasswordType.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(adapterView: AdapterView<*>?, view: View?, position: Int, id: Long) {
+            override fun onItemSelected(
+                adapterView: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
                 viewModel.passwordType.value = adapterView?.getItemAtPosition(position).toString()
             }
 
@@ -83,7 +101,7 @@ class GeneratePasswordFragment : Fragment() {
             }
         }
 
-        binding.etPasswordLength.addTextChangedListener(object: TextWatcher{
+        binding.etPasswordLength.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
             }
 
@@ -102,35 +120,45 @@ class GeneratePasswordFragment : Fragment() {
                 Utilities.showToast(message, requireContext())
                 return@setOnClickListener
             }
-            val password = viewModel.generatePassword(viewModel.passwordType.value ?: StringUtils.EMPTY, viewModel.passwordLength.value?.toInt() ?: 0)
-            viewModel.password.value = password
-            val time = System.currentTimeMillis()
-            if (viewModel.queue.size >= 10) {
-                viewModel.queue.remove()
-            }
-            val list = viewModel.queue.toList()
-            var key = ""
-            val llist = mutableListOf<String>()
-            for (item in list) {
-                llist.add(item.key)
-            }
-            for (item in preferenceManager!!.list) {
-                if (!llist.contains(item)) {
-                    key = item
-                    break
-                }
-            }
-            val passwordData = PasswordData(key, password, time)
-            viewModel.cachePassword(requireContext(), passwordData)
+            generateAndCachePassword()
         }
 
         binding.ivCopy.setOnClickListener {
-            Utilities.copyContentToClipboard(viewModel.password.value ?: StringUtils.EMPTY, requireContext())
-            Utilities.showToast("Copied to clipboard", requireContext())
+            Utilities.copyContentToClipboard(
+                viewModel.password.value ?: StringUtils.EMPTY,
+                requireContext()
+            )
+            Utilities.showToast(getString(R.string.copied_to_clipboard), requireContext())
         }
 
         binding.ivShare.setOnClickListener {
             Utilities.shareContent(viewModel.password.value ?: StringUtils.EMPTY, requireContext())
         }
+    }
+
+    private fun generateAndCachePassword() {
+        val password = viewModel.generatePassword(
+            viewModel.passwordType.value ?: StringUtils.EMPTY,
+            viewModel.passwordLength.value?.toInt() ?: 0
+        )
+        viewModel.password.value = password
+        val time = System.currentTimeMillis()
+        if (viewModel.queue.size >= 10) {
+            viewModel.queue.remove()
+        }
+        queueList = viewModel.queue.toList()
+        var key = StringUtils.EMPTY
+        val keyList = mutableListOf<String>()
+        for (item in queueList) {
+            keyList.add(item.key)
+        }
+        for (item in preferenceManager!!.list) {
+            if (!keyList.contains(item)) {
+                key = item
+                break
+            }
+        }
+        val passwordData = PasswordData(key, password, time)
+        viewModel.cachePassword(requireContext(), passwordData)
     }
 }

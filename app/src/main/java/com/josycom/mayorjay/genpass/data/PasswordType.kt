@@ -12,7 +12,7 @@ enum class PasswordType(val displayText: String, val characters: String) {
 }
 
 fun getPasswordDisplayTexts(): MutableList<String> {
-    val list = mutableListOf(Constants.SELECT_PASSWORD_TYPE)
+    val list = mutableListOf(Constants.PASSWORD_TYPE)
     for (item in PasswordType.values()) {
         list.add(item.displayText)
     }

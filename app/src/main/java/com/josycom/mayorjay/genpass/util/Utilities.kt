@@ -13,7 +13,7 @@ object Utilities {
         text: String,
         context: Context
     ) {
-        Toast.makeText(context, text, Toast.LENGTH_LONG).show()
+        Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
     }
 
     fun copyContentToClipboard(

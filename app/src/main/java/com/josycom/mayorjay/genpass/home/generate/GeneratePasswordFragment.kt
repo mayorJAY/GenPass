@@ -1,11 +1,13 @@
 package com.josycom.mayorjay.genpass.home.generate
 
+import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.core.view.isVisible
@@ -19,6 +21,7 @@ import com.josycom.mayorjay.genpass.persistence.PreferenceManager
 import com.josycom.mayorjay.genpass.persistence.dataStore
 import com.josycom.mayorjay.genpass.util.Utilities
 import org.apache.commons.lang3.StringUtils
+import java.util.Date
 
 
 class GeneratePasswordFragment : Fragment() {
@@ -72,7 +75,7 @@ class GeneratePasswordFragment : Fragment() {
     }
 
     private fun setupSpinnerAdapter() {
-        ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, viewModel.getPasswordTypes()).apply {
+        ArrayAdapter(requireContext(), R.layout.simple_spinner_item, viewModel.getPasswordTypes()).apply {
             setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             binding.spPasswordType.adapter = this
         }
@@ -115,6 +118,8 @@ class GeneratePasswordFragment : Fragment() {
 
         binding.btGenerate.setOnClickListener {
             viewModel.password.value = StringUtils.EMPTY
+            val inputMethodManager = requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            inputMethodManager.hideSoftInputFromWindow(requireActivity().currentFocus?.windowToken, 0)
             val message = viewModel.validateInputs()
             if (StringUtils.isNotBlank(message)) {
                 Utilities.showToast(message, requireContext())
@@ -128,7 +133,6 @@ class GeneratePasswordFragment : Fragment() {
                 viewModel.password.value ?: StringUtils.EMPTY,
                 requireContext()
             )
-            Utilities.showToast(getString(R.string.copied_to_clipboard), requireContext())
         }
 
         binding.ivShare.setOnClickListener {
@@ -142,7 +146,7 @@ class GeneratePasswordFragment : Fragment() {
             viewModel.passwordLength.value?.toInt() ?: 0
         )
         viewModel.password.value = password
-        val time = System.currentTimeMillis()
+        val time = Date().time
         if (viewModel.queue.size >= 10) {
             viewModel.queue.remove()
         }

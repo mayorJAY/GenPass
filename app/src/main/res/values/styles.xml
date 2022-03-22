@@ -5,6 +5,7 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:fontFamily">@font/poppins</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -16,7 +17,7 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Light" />
 
-    <!-- SplashScreen theme. -->
+    <!-- SplashScreen theme -->
     <style name="SplashScreenTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="android:windowBackground">@color/colorWhite</item>
         <item name="android:windowFullscreen">true</item>
@@ -27,7 +28,7 @@
         <item name="android:windowContentOverlay">@null</item>
     </style>
 
-    <!-- SplashScreen theme. -->
+    <!-- OnBoardScreen theme -->
     <style name="onBoardScreenTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="android:windowBackground">@color/colorPrimary</item>
         <item name="android:windowFullscreen">true</item>

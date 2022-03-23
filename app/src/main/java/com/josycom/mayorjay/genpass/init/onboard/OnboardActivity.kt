@@ -59,7 +59,6 @@ class OnboardActivity : AppCompatActivity() {
     }
 
     private fun setupListeners() {
-        binding.viewPager.registerOnPageChangeCallback(callback)
         binding.btProceed.setOnClickListener {
             navigateToHome()
         }
@@ -137,9 +136,18 @@ class OnboardActivity : AppCompatActivity() {
         }, 500, 2000)
     }
 
+    override fun onStart() {
+        super.onStart()
+        binding.viewPager.registerOnPageChangeCallback(callback)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        binding.viewPager.unregisterOnPageChangeCallback(callback)
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         timer.cancel()
-        binding.viewPager.unregisterOnPageChangeCallback(callback)
     }
 }

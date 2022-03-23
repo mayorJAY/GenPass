@@ -26,16 +26,16 @@ class GeneratePasswordViewModel : ViewModel() {
     fun getPasswordTypes(): MutableList<String> = getPasswordDisplayTexts()
 
     fun validateInputs(): String {
-        if (StringUtils.isBlank(passwordType.value) || StringUtils.equalsIgnoreCase(passwordType.value, Constants.SELECT_PASSWORD_TYPE)) {
+        if (StringUtils.isBlank(passwordType.value) || StringUtils.equalsIgnoreCase(passwordType.value, Constants.PASSWORD_TYPE)) {
             return Constants.SELECT_PASSWORD_TYPE
         }
 
-        if (passwordLength.value == null) {
-            return "Password Length cannot be blank"
+        if (StringUtils.isBlank(passwordLength.value)) {
+            return Constants.SPECIFY_PASSWORD_LENGTH
         }
 
         if (passwordLength.value?.toInt() ?: 0 < 16 || passwordLength.value?.toInt() ?: 0 > 64) {
-            return "Please input a value between 16 and 64"
+            return Constants.INPUT_VALID_PASSWORD_LENGTH
         }
         return StringUtils.EMPTY
     }
@@ -54,9 +54,6 @@ class GeneratePasswordViewModel : ViewModel() {
 
     fun cachePassword(context: Context, passwordData: PasswordData) {
         val dataStore = PreferenceManager(context.dataStore)
-        if (queue.size >= 10) {
-            queue.remove()
-        }
         queue.add(passwordData)
         for (item in queue) {
             viewModelScope.launch {

@@ -1,27 +1,27 @@
 package com.josycom.mayorjay.genpass.home.view
 
-import android.app.AlertDialog
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.josycom.mayorjay.genpass.data.PasswordData
 import com.josycom.mayorjay.genpass.databinding.FragmentPasswordListBinding
 import com.josycom.mayorjay.genpass.persistence.PreferenceManager
 import com.josycom.mayorjay.genpass.persistence.dataStore
+import com.josycom.mayorjay.genpass.util.Utilities
 import org.apache.commons.lang3.StringUtils
-import java.sql.Timestamp
 
 class PasswordListFragment : Fragment() {
 
     private val viewModel: PasswordListViewModel by viewModels()
     private lateinit var binding: FragmentPasswordListBinding
-    private val list = mutableListOf<String>()
-    private val listOf = mutableListOf<PasswordData>()
+    private val passwordList = mutableListOf<PasswordData>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,40 +33,52 @@ class PasswordListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-//        viewModel = ViewModelProvider(this)[PasswordListViewModel::class.java]
 
+        retrievePasswords()
+        displayPasswords()
+    }
+
+    private fun retrievePasswords() {
         val dataStore = PreferenceManager(requireContext().dataStore)
         for (item in dataStore.list) {
             dataStore.getPasswordPrefFlow(item).asLiveData().observe(viewLifecycleOwner, { value ->
-                val iterator = listOf.listIterator()
+                val iterator = passwordList.listIterator()
                 while (iterator.hasNext()) {
                     if (StringUtils.equalsIgnoreCase(iterator.next().key , item)) {
                         iterator.remove()
                     }
                 }
                 if (value != null && StringUtils.isNotBlank(value)) {
-                    listOf.add(PasswordData(item, value.substringBefore("-"), value.substringAfter("-").toLong()))
+                    passwordList.add(PasswordData(item, value.substringBefore("-"), value.substringAfter("-").toLong()))
+                    passwordList.sortWith { p0, p1 -> (p0?.timeGenerated ?: 0L).compareTo(p1?.timeGenerated ?: 0L) }
+                    viewModel.passwordList.value = passwordList
                 }
             })
         }
-
-        binding.textView.setOnClickListener {
-            displayPasswords()
-        }
     }
 
-    private fun displayPasswords() {
-        listOf.sortWith { p0, p1 -> (p0?.timeGenerated ?: 0L).compareTo(p1?.timeGenerated ?: 0L) }
-        listOf.forEach {
-            val value = "${Timestamp(it.timeGenerated)}-->${it.password}"
-            if (!list.contains(value)) {
-                list.add(value)
-            }
+    fun displayPasswords() {
+        val passwordListAdapter = PasswordListAdapter()
+        binding.rvPasswords.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            itemAnimator = DefaultItemAnimator()
+            adapter = passwordListAdapter
         }
-        val dialog = AlertDialog.Builder(requireContext())
-        list.reverse()
-        dialog.setItems(list.toTypedArray(), null)
-        dialog.show()
+        viewModel.passwordList.observe(viewLifecycleOwner, { list ->
+            binding.tvImage.isVisible = list.isEmpty()
+            binding.tvInfoDisplay.isVisible = list.isEmpty()
+            passwordListAdapter.setData(list.reversed())
+        })
+        passwordListAdapter.setOnClickListeners(copyListener, shareListener)
     }
 
+    private val copyListener = View.OnClickListener { v ->
+        val password = v?.tag as String
+        Utilities.copyContentToClipboard(password, requireContext())
+    }
+
+    private val shareListener = View.OnClickListener { v ->
+        val password = v?.tag as String
+        Utilities.shareContent(password, requireContext())
+    }
 }

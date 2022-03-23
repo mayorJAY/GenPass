@@ -8,7 +8,7 @@ enum class PasswordType(val displayText: String, val characters: String) {
     ALPHABET("Alphabets Only", "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"),
     ALPHANUMERIC("Alphanumeric Only", "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"),
     NUMERIC("Numbers Only", "1234567890"),
-    ALPHANUMERIC_SYMBOL("Alphanumeric and Symbols", "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()")
+    ALPHANUMERIC_SYMBOL("Alphanumeric and Symbols", "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!\"\\#$%&()*+,./:;<=>?@[]^_|{}~")
 }
 
 fun getPasswordDisplayTexts(): MutableList<String> {

@@ -46,7 +46,7 @@ object Utilities {
 
     fun getFormattedDate(time: Long): String? {
         val date = Date(time)
-        val simpleDateFormat = SimpleDateFormat("E dd/MMM/yyyy HH:mm", Locale.getDefault())
+        val simpleDateFormat = SimpleDateFormat("E dd-MMM-yyyy HH:mm:ss", Locale.getDefault())
         return simpleDateFormat.format(date)
     }
 }

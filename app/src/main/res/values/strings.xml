@@ -12,4 +12,6 @@
     <string name="generate_password">Generate Password</string>
     <string name="password_length">Password Length</string>
     <string name="copied_to_clipboard">Copied to clipboard</string>
+    <string name="no_passwords_yet">Uhm! No Passwords generated yet! \nYour generated Passwords will be displayed here</string>
+    <string name="smiling_emoji">&#128542;</string>
 </resources>

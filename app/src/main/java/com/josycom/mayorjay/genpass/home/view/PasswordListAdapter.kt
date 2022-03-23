@@ -31,7 +31,7 @@ class PasswordListAdapter : RecyclerView.Adapter<PasswordListAdapter.PasswordVie
         passwordData = passwordList
     }
 
-    fun setOnClickListeners(copyOnClickListener: View.OnClickListener?, shareOnClickListener: View.OnClickListener?) {
+    fun setOnClickListeners(copyOnClickListener: View.OnClickListener, shareOnClickListener: View.OnClickListener) {
         copyClickListener = copyOnClickListener
         shareClickListener = shareOnClickListener
     }

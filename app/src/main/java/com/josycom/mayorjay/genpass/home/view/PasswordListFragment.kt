@@ -66,7 +66,7 @@ class PasswordListFragment : Fragment() {
         }
         viewModel.passwordList.observe(viewLifecycleOwner, { list ->
             binding.tvImage.isVisible = list.isEmpty()
-            binding.tvOopsDisplay.isVisible = list.isEmpty()
+            binding.tvInfoDisplay.isVisible = list.isEmpty()
             passwordListAdapter.setData(list.reversed())
         })
         passwordListAdapter.setOnClickListeners(copyListener, shareListener)

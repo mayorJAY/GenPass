@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">GenPass: Password Generator</string>
+    <string name="genpass">GenPass</string>
     <string name="tab_text_1">Generate</string>
     <string name="tab_text_2">Recent Passwords</string>
     <string name="proceed">Proceed</string>
@@ -13,5 +14,5 @@
     <string name="password_length">Password Length</string>
     <string name="copied_to_clipboard">Copied to clipboard</string>
     <string name="no_passwords_yet">Uhm! No Passwords generated yet! \nYour generated Passwords will be displayed here</string>
-    <string name="smiling_emoji">&#128542;</string>
+    <string name="emoji_display">&#128542;</string>
 </resources>

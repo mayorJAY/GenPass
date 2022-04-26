@@ -30,15 +30,10 @@ class SplashActivity : AppCompatActivity() {
     }
 
     private fun startJob() {
-        cancelJob()
         job = lifecycleScope.launch {
             delay(1500)
             proceedToNextView()
         }
-    }
-
-    private fun cancelJob() {
-        job?.cancel()
     }
 
     private fun proceedToNextView() {
@@ -50,6 +45,6 @@ class SplashActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        cancelJob()
+        job?.cancel()
     }
 }

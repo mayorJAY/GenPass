@@ -15,7 +15,7 @@ class SplashViewModel(application: Application) : AndroidViewModel(application) 
     var isFirstLaunch: LiveData<Boolean>? = null
 
     init {
-        preferenceManager = PreferenceManager(application.applicationContext.dataStore)
+        preferenceManager = PreferenceManager(application.dataStore)
         isFirstLaunch = preferenceManager?.getFirstLaunchPrefFlow()?.asLiveData()
     }
 

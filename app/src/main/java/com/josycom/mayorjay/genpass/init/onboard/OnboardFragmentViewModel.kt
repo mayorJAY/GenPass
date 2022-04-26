@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.josycom.mayorjay.genpass.data.OnboardData
 
-class OnboardViewModel : ViewModel() {
+class OnboardFragmentViewModel : ViewModel() {
 
     private val _onBoardData = MutableLiveData<OnboardData>()
     val onboardData: LiveData<OnboardData> = _onBoardData

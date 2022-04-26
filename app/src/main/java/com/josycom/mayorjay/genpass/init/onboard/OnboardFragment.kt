@@ -11,7 +11,7 @@ import com.josycom.mayorjay.genpass.databinding.FragmentOnboardBinding
 
 class OnboardFragment : Fragment() {
 
-    private val viewModel: OnboardViewModel by viewModels()
+    private val viewModel: OnboardFragmentViewModel by viewModels()
     private lateinit var binding: FragmentOnboardBinding
     private var onboardData: OnboardData? = null
 
@@ -45,7 +45,6 @@ class OnboardFragment : Fragment() {
     }
 
     companion object {
-        @JvmStatic
         fun newInstance(onboardData: OnboardData): OnboardFragment {
             return OnboardFragment().apply {
                 this.onboardData = onboardData

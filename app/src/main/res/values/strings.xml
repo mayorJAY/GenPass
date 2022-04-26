@@ -15,4 +15,6 @@
     <string name="copied_to_clipboard">Copied to clipboard</string>
     <string name="no_passwords_yet">Uhm! No Passwords generated yet! \nYour generated Passwords will be displayed here</string>
     <string name="emoji_display">&#128542;</string>
+    <string name="update_downloaded">An update has just been downloaded</string>
+    <string name="restart">Restart</string>
 </resources>

@@ -47,13 +47,12 @@ class GeneratePasswordFragment : Fragment() {
         setupSpinnerAdapter()
         setupListeners()
         observeGeneratedPassword()
-        //Todo: Implement update installer
         //Todo: Implement app review prompt
     }
 
     private fun observePasswordPref() {
-        for (key in preferenceManager!!.list) {
-            preferenceManager!!.getPasswordPrefFlow(key).asLiveData().observe(
+        for (key in preferenceManager?.list ?: listOf()) {
+            preferenceManager?.getPasswordPrefFlow(key)?.asLiveData()?.observe(
                 viewLifecycleOwner,
                 { value ->
                     queueList = viewModel.queue.toList()
@@ -156,7 +155,7 @@ class GeneratePasswordFragment : Fragment() {
         for (item in queueList) {
             keyList.add(item.key)
         }
-        for (item in preferenceManager!!.list) {
+        for (item in preferenceManager?.list ?: listOf()) {
             if (!keyList.contains(item)) {
                 key = item
                 break

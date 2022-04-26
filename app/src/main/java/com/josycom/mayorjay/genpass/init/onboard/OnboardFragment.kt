@@ -41,9 +41,7 @@ class OnboardFragment : Fragment() {
     }
 
     private fun setOnboardData() {
-        if (onboardData != null) {
-            viewModel.setOnboardData(onboardData!!)
-        }
+        viewModel.setOnboardData(onboardData)
     }
 
     companion object {

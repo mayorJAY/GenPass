@@ -10,7 +10,7 @@ class OnboardViewModel : ViewModel() {
     private val _onBoardData = MutableLiveData<OnboardData>()
     val onboardData: LiveData<OnboardData> = _onBoardData
 
-    fun setOnboardData(onboardData: OnboardData) {
+    fun setOnboardData(onboardData: OnboardData?) {
         _onBoardData.value = onboardData
     }
 }

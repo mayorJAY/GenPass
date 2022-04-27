@@ -24,7 +24,6 @@ import com.josycom.mayorjay.genpass.util.showToast
 import org.apache.commons.lang3.StringUtils
 import java.util.Date
 
-
 class GeneratePasswordFragment : Fragment() {
 
     private val viewModel: GeneratePasswordViewModel by viewModels()
@@ -57,7 +56,7 @@ class GeneratePasswordFragment : Fragment() {
                     for (item in viewModel.queueToList) {
                         passList.add("${item.password}-${item.timeGenerated}")
                     }
-                    if (value != null && StringUtils.isNotBlank(value) && !passList.contains(value)) {
+                    if (StringUtils.isNotBlank(value) && !passList.contains(value)) {
                         viewModel.passwordQueue.add(
                             PasswordData(
                                 key, value.substringBefore("-"), value.substringAfter(
@@ -125,11 +124,11 @@ class GeneratePasswordFragment : Fragment() {
         }
 
         binding.ivCopy.setOnClickListener {
-            requireContext().copyContentToClipboard(viewModel.password.value ?: StringUtils.EMPTY)
+            requireContext().copyContentToClipboard(viewModel.password.value)
         }
 
         binding.ivShare.setOnClickListener {
-            requireContext().shareContent(viewModel.password.value ?: StringUtils.EMPTY)
+            requireContext().shareContent(viewModel.password.value)
         }
     }
 

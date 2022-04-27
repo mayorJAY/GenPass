@@ -13,11 +13,11 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-fun Context.showToast(message: String) {
+fun Context.showToast(message: String?) {
     Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
 }
 
-fun Context.copyContentToClipboard(content: String) {
+fun Context.copyContentToClipboard(content: String?) {
     val clipboard = this.getSystemService(Activity.CLIPBOARD_SERVICE) as ClipboardManager
     val label = "New Password"
     val clipData = ClipData.newPlainText(label, content)
@@ -27,7 +27,7 @@ fun Context.copyContentToClipboard(content: String) {
     this.showToast(this.getString(R.string.copied_to_clipboard))
 }
 
-fun Context.shareContent(content: String) {
+fun Context.shareContent(content: String?) {
     val intent = Intent(Intent.ACTION_SEND).apply {
         type = "text/plain"
         putExtra(Intent.EXTRA_TEXT, content)

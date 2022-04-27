@@ -20,14 +20,13 @@ import com.google.android.play.core.install.model.UpdateAvailability
 import com.google.android.play.core.tasks.OnSuccessListener
 import com.josycom.mayorjay.genpass.R
 import com.josycom.mayorjay.genpass.databinding.ActivityHomeBinding
+import com.josycom.mayorjay.genpass.util.Constants.APP_UPDATE
+import com.josycom.mayorjay.genpass.util.showSnackBar
 
 class HomeActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityHomeBinding
     private var appUpdateManager: AppUpdateManager? = null
-    companion object {
-        private const val APP_UPDATE = 10
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,6 +34,7 @@ class HomeActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setupViewPager()
+        //Todo: Implement app review prompt
     }
 
     private fun setupViewPager() {
@@ -63,9 +63,7 @@ class HomeActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        if (appUpdateManager != null) {
-            appUpdateManager?.unregisterListener(installStateUpdatedListener)
-        }
+        appUpdateManager?.unregisterListener(installStateUpdatedListener)
     }
 
     override fun onStop() {
@@ -86,9 +84,7 @@ class HomeActivity : AppCompatActivity() {
                     popupSnackBarForDownloadedUpdate()
                 }
                 InstallStatus.INSTALLED -> {
-                    if (appUpdateManager != null) {
-                        appUpdateManager?.unregisterListener(this)
-                    }
+                    appUpdateManager?.unregisterListener(this)
                 }
                 else -> {
                     Log.i("UpdateInstaller", "InstallStateUpdatedListener >>>>> ${state.installStatus()}")
@@ -118,15 +114,17 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
+    private fun completeUpdate() {
+        appUpdateManager?.completeUpdate()
+    }
+
     private fun popupSnackBarForDownloadedUpdate() {
-        Snackbar.make(binding.root, getString(R.string.update_downloaded), Snackbar.LENGTH_INDEFINITE).apply {
-            setActionTextColor(ContextCompat.getColor(this@HomeActivity, R.color.colorWhite))
-            setAction(getString(R.string.restart)) {
-                if (appUpdateManager != null) {
-                    appUpdateManager?.completeUpdate()
-                }
-            }
-            show()
-        }
+        binding.root.showSnackBar(
+            getString(R.string.update_downloaded),
+            Snackbar.LENGTH_INDEFINITE,
+            getString(R.string.restart),
+            ContextCompat.getColor(this@HomeActivity, R.color.colorWhite),
+            this::completeUpdate
+        )
     }
 }

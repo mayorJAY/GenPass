@@ -1,8 +1,8 @@
 package com.josycom.mayorjay.genpass.home.generate
 
-import android.content.Context
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.josycom.mayorjay.genpass.data.PasswordData
 import com.josycom.mayorjay.genpass.data.getPasswordCharacters
@@ -16,33 +16,39 @@ import java.security.SecureRandom
 import java.util.LinkedList
 import java.util.Queue
 
-class GeneratePasswordViewModel : ViewModel() {
+class GeneratePasswordViewModel(application: Application) : AndroidViewModel(application) {
 
     val passwordType = MutableLiveData<String>()
     val passwordLength = MutableLiveData<String>()
     val password = MutableLiveData<String>()
-    val queue: Queue<PasswordData> = LinkedList()
+    val passwordQueue: Queue<PasswordData> = LinkedList()
+    var preferenceManager: PreferenceManager? = null
+    var queueToList = listOf<PasswordData>()
+
+    init {
+        preferenceManager = PreferenceManager(application.dataStore)
+    }
 
     fun getPasswordTypes(): MutableList<String> = getPasswordDisplayTexts()
 
-    fun validateInputs(): String {
-        if (StringUtils.isBlank(passwordType.value) || StringUtils.equalsIgnoreCase(passwordType.value, Constants.PASSWORD_TYPE)) {
+    fun validateInputs(passwordType: String?, passwordLength: String?): String {
+        if (StringUtils.isBlank(passwordType) || StringUtils.equalsIgnoreCase(passwordType, Constants.PASSWORD_TYPE)) {
             return Constants.SELECT_PASSWORD_TYPE
         }
 
-        if (StringUtils.isBlank(passwordLength.value)) {
+        if (StringUtils.isBlank(passwordLength)) {
             return Constants.SPECIFY_PASSWORD_LENGTH
         }
 
-        if (passwordLength.value?.toInt() ?: 0 < 16 || passwordLength.value?.toInt() ?: 0 > 64) {
+        if (passwordLength?.toInt() ?: 0 < 16 || passwordLength?.toInt() ?: 0 > 64) {
             return Constants.INPUT_VALID_PASSWORD_LENGTH
         }
         return StringUtils.EMPTY
     }
 
-    fun generatePassword(passwordType: String, passwordLength: Int): String {
+    fun generatePassword(passwordType: String?, passwordLength: Int): String {
         val buffer = StringBuffer()
-        val characters = getPasswordCharacters(passwordType)
+        val characters = getPasswordCharacters(passwordType ?: StringUtils.EMPTY)
         val charactersLength = characters.length
         val secureRandom = SecureRandom()
         for (i in 0 until passwordLength) {
@@ -52,12 +58,30 @@ class GeneratePasswordViewModel : ViewModel() {
         return buffer.toString()
     }
 
-    fun cachePassword(context: Context, passwordData: PasswordData) {
-        val dataStore = PreferenceManager(context.dataStore)
-        queue.add(passwordData)
-        for (item in queue) {
+    fun getNextAvailableKey(): String {
+        if (passwordQueue.size >= 10) {
+            passwordQueue.remove()
+        }
+        queueToList = passwordQueue.toList()
+        var key = StringUtils.EMPTY
+        val keyList = mutableListOf<String>()
+        for (item in queueToList) {
+            keyList.add(item.key)
+        }
+        for (item in Constants.PASSWORD_KEY_LIST) {
+            if (!keyList.contains(item)) {
+                key = item
+                break
+            }
+        }
+        return key
+    }
+
+    fun cachePassword(passwordData: PasswordData) {
+        passwordQueue.add(passwordData)
+        for (item in passwordQueue) {
             viewModelScope.launch {
-                dataStore.setPasswordPref(item.key, "${item.password}-${item.timeGenerated}")
+                preferenceManager?.setPasswordPref(item.key, "${item.password}-${item.timeGenerated}")
             }
         }
     }

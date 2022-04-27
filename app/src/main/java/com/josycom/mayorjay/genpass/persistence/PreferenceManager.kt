@@ -8,11 +8,11 @@ import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.josycom.mayorjay.genpass.util.Constants.PREFERENCES_FILE_NAME
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 
-private const val PREFERENCES_FILE_NAME = "gp_preferences"
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
     name = PREFERENCES_FILE_NAME
 )
@@ -20,7 +20,6 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
 class PreferenceManager(private val dataStore: DataStore<Preferences>) {
 
     private val isFirstLaunchPref = booleanPreferencesKey("isFirstLaunch")
-    val list = listOf("password1", "password2", "password3", "password4", "password5", "password6", "password7", "password8", "password9", "password10")
 
     private fun getBooleanPreferenceFlow(key: Preferences.Key<Boolean>): Flow<Boolean> {
         return dataStore.data

@@ -14,7 +14,9 @@ import com.josycom.mayorjay.genpass.data.PasswordData
 import com.josycom.mayorjay.genpass.databinding.FragmentPasswordListBinding
 import com.josycom.mayorjay.genpass.persistence.PreferenceManager
 import com.josycom.mayorjay.genpass.persistence.dataStore
-import com.josycom.mayorjay.genpass.util.Utilities
+import com.josycom.mayorjay.genpass.util.Constants
+import com.josycom.mayorjay.genpass.util.copyContentToClipboard
+import com.josycom.mayorjay.genpass.util.shareContent
 import org.apache.commons.lang3.StringUtils
 
 class PasswordListFragment : Fragment() {
@@ -40,7 +42,7 @@ class PasswordListFragment : Fragment() {
 
     private fun retrievePasswords() {
         val dataStore = PreferenceManager(requireContext().dataStore)
-        for (item in dataStore.list) {
+        for (item in Constants.PASSWORD_KEY_LIST) {
             dataStore.getPasswordPrefFlow(item).asLiveData().observe(viewLifecycleOwner, { value ->
                 val iterator = passwordList.listIterator()
                 while (iterator.hasNext()) {
@@ -74,11 +76,11 @@ class PasswordListFragment : Fragment() {
 
     private val copyListener = View.OnClickListener { v ->
         val password = v?.tag as String
-        Utilities.copyContentToClipboard(password, requireContext())
+        requireContext().copyContentToClipboard(password)
     }
 
     private val shareListener = View.OnClickListener { v ->
         val password = v?.tag as String
-        Utilities.shareContent(password, requireContext())
+        requireContext().shareContent(password)
     }
 }

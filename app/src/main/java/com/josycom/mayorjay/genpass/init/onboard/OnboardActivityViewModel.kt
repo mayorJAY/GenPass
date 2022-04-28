@@ -4,14 +4,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.josycom.mayorjay.genpass.persistence.IPreferenceManager
-import com.josycom.mayorjay.genpass.util.Constants
 import kotlinx.coroutines.launch
 
 class OnboardActivityViewModel(private val preferenceManager: IPreferenceManager) : ViewModel() {
 
-    fun setPref() {
+    fun setLaunchPref(key: String, value: Boolean) {
         viewModelScope.launch {
-            preferenceManager.setBooleanPreference(Constants.FIRST_LAUNCH_PREF_KEY, false)
+            preferenceManager.setBooleanPreference(key, value)
         }
     }
 }

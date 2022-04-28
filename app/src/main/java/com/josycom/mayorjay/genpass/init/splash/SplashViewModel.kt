@@ -6,15 +6,14 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.josycom.mayorjay.genpass.persistence.IPreferenceManager
-import com.josycom.mayorjay.genpass.util.Constants
 import kotlinx.coroutines.launch
 
 class SplashViewModel(private val preferenceManager: IPreferenceManager) : ViewModel() {
 
     var isFirstLaunch: LiveData<Boolean>? = null
 
-    init {
-        isFirstLaunch = preferenceManager.getBooleanPreferenceFlow(Constants.FIRST_LAUNCH_PREF_KEY).asLiveData()
+    fun getLaunchPref(key: String) {
+        isFirstLaunch = preferenceManager.getBooleanPreferenceFlow(key).asLiveData()
     }
 
     fun deletePreferences() {

@@ -15,6 +15,7 @@ import com.josycom.mayorjay.genpass.databinding.ActivityOnboardBinding
 import com.josycom.mayorjay.genpass.home.HomeActivity
 import com.josycom.mayorjay.genpass.persistence.PreferenceManager
 import com.josycom.mayorjay.genpass.persistence.dataStore
+import com.josycom.mayorjay.genpass.util.Constants
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -39,7 +40,7 @@ class OnboardActivity : AppCompatActivity() {
         setupViews()
         setupListeners()
         enableViewPagerAutoScroll()
-        setPref()
+        setLaunchPref()
     }
 
     private fun setupViews() {
@@ -79,8 +80,8 @@ class OnboardActivity : AppCompatActivity() {
         }
     }
 
-    private fun setPref() {
-        viewModel.setPref()
+    private fun setLaunchPref() {
+        viewModel.setLaunchPref(Constants.FIRST_LAUNCH_PREF_KEY, false)
     }
 
     private fun navigateToHome() {

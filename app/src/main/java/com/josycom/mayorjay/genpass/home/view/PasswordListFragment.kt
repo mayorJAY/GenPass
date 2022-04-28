@@ -44,7 +44,7 @@ class PasswordListFragment : Fragment() {
 
     private fun retrievePasswords() {
         for (item in Constants.PASSWORD_KEY_LIST) {
-            viewModel.preferenceManager.getStringPreferenceFlow(item).asLiveData().observe(viewLifecycleOwner, { value ->
+            viewModel.getPasswordPref(item).observe(viewLifecycleOwner, { value ->
                 val iterator = viewModel.tempPasswordList.listIterator()
                 while (iterator.hasNext()) {
                     if (StringUtils.equalsIgnoreCase(iterator.next().key , item)) {

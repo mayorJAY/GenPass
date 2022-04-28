@@ -10,6 +10,7 @@ import com.josycom.mayorjay.genpass.home.HomeActivity
 import com.josycom.mayorjay.genpass.init.onboard.OnboardActivity
 import com.josycom.mayorjay.genpass.persistence.PreferenceManager
 import com.josycom.mayorjay.genpass.persistence.dataStore
+import com.josycom.mayorjay.genpass.util.Constants
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -28,10 +29,19 @@ class SplashActivity : AppCompatActivity() {
         setContentView(R.layout.activity_splash)
 
 //        viewModel.deletePreferences()
+        getLaunchPref()
+        observeLaunchPref()
+        startJob()
+    }
+
+    private fun getLaunchPref() {
+        viewModel.getLaunchPref(Constants.FIRST_LAUNCH_PREF_KEY)
+    }
+
+    private fun observeLaunchPref() {
         viewModel.isFirstLaunch?.observe(this, { value ->
             isFirstLaunch = value
         })
-        startJob()
     }
 
     private fun startJob() {

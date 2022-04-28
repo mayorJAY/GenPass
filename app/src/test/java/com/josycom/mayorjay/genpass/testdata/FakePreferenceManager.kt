@@ -9,7 +9,9 @@ class FakePreferenceManager : IPreferenceManager {
     private val fakeDataStore: MutableMap<String, Any> = mutableMapOf()
 
     override fun getBooleanPreferenceFlow(key: String): Flow<Boolean> {
-        return flow { fakeDataStore[key] as Boolean }
+        return flow {
+            emit(fakeDataStore[key] as Boolean)
+        }
     }
 
     override suspend fun setBooleanPreference(key: String, value: Boolean) {
@@ -17,7 +19,9 @@ class FakePreferenceManager : IPreferenceManager {
     }
 
     override fun getStringPreferenceFlow(key: String): Flow<String> {
-        return flow { fakeDataStore[key] as String }
+        return flow {
+            emit(fakeDataStore[key] as String)
+        }
     }
 
     override suspend fun setStringPreference(key: String, value: String) {
@@ -27,4 +31,6 @@ class FakePreferenceManager : IPreferenceManager {
     override suspend fun deleteAllPreferences() {
         fakeDataStore.clear()
     }
+
+    fun isEmpty() = fakeDataStore.isEmpty()
 }

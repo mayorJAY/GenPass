@@ -17,6 +17,8 @@ import androidx.lifecycle.asLiveData
 import com.josycom.mayorjay.genpass.R
 import com.josycom.mayorjay.genpass.data.PasswordData
 import com.josycom.mayorjay.genpass.databinding.FragmentGeneratePasswordBinding
+import com.josycom.mayorjay.genpass.persistence.PreferenceManager
+import com.josycom.mayorjay.genpass.persistence.dataStore
 import com.josycom.mayorjay.genpass.util.Constants
 import com.josycom.mayorjay.genpass.util.copyContentToClipboard
 import com.josycom.mayorjay.genpass.util.shareContent
@@ -26,7 +28,10 @@ import java.util.Date
 
 class GeneratePasswordFragment : Fragment() {
 
-    private val viewModel: GeneratePasswordViewModel by viewModels()
+    private val viewModel: GeneratePasswordViewModel by viewModels {
+        val preferenceManager = PreferenceManager(requireContext().dataStore)
+        GeneratePasswordViewModelFactory(preferenceManager)
+    }
     private lateinit var binding: FragmentGeneratePasswordBinding
 
     override fun onCreateView(
@@ -48,7 +53,7 @@ class GeneratePasswordFragment : Fragment() {
 
     private fun observePasswordPref() {
         for (key in Constants.PASSWORD_KEY_LIST) {
-            viewModel.preferenceManager?.getPasswordPrefFlow(key)?.asLiveData()?.observe(
+            viewModel.preferenceManager.getStringPreferenceFlow(key).asLiveData().observe(
                 viewLifecycleOwner,
                 { value ->
                     viewModel.queueToList = viewModel.passwordQueue.toList()

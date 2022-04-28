@@ -12,6 +12,8 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.josycom.mayorjay.genpass.data.PasswordData
 import com.josycom.mayorjay.genpass.databinding.FragmentPasswordListBinding
+import com.josycom.mayorjay.genpass.persistence.PreferenceManager
+import com.josycom.mayorjay.genpass.persistence.dataStore
 import com.josycom.mayorjay.genpass.util.Constants
 import com.josycom.mayorjay.genpass.util.copyContentToClipboard
 import com.josycom.mayorjay.genpass.util.shareContent
@@ -19,7 +21,10 @@ import org.apache.commons.lang3.StringUtils
 
 class PasswordListFragment : Fragment() {
 
-    private val viewModel: PasswordListViewModel by viewModels()
+    private val viewModel: PasswordListViewModel by viewModels {
+        val preferenceManager = PreferenceManager(requireContext().dataStore)
+        PasswordListViewModelFactory(preferenceManager)
+    }
     private lateinit var binding: FragmentPasswordListBinding
 
     override fun onCreateView(
@@ -39,7 +44,7 @@ class PasswordListFragment : Fragment() {
 
     private fun retrievePasswords() {
         for (item in Constants.PASSWORD_KEY_LIST) {
-            viewModel.preferenceManager?.getPasswordPrefFlow(item)?.asLiveData()?.observe(viewLifecycleOwner, { value ->
+            viewModel.preferenceManager.getStringPreferenceFlow(item).asLiveData().observe(viewLifecycleOwner, { value ->
                 val iterator = viewModel.tempPasswordList.listIterator()
                 while (iterator.hasNext()) {
                     if (StringUtils.equalsIgnoreCase(iterator.next().key , item)) {

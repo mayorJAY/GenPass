@@ -1,23 +1,25 @@
 package com.josycom.mayorjay.genpass.init.onboard
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.josycom.mayorjay.genpass.persistence.PreferenceManager
-import com.josycom.mayorjay.genpass.persistence.dataStore
+import com.josycom.mayorjay.genpass.persistence.IPreferenceManager
+import com.josycom.mayorjay.genpass.util.Constants
 import kotlinx.coroutines.launch
 
-class OnboardActivityViewModel(application: Application) : AndroidViewModel(application) {
-
-    private var preferenceManager: PreferenceManager? = null
-
-    init {
-        preferenceManager = PreferenceManager(application.dataStore)
-    }
+class OnboardActivityViewModel(private val preferenceManager: IPreferenceManager) : ViewModel() {
 
     fun setPref() {
         viewModelScope.launch {
-            preferenceManager?.setFirstLaunchPref(false)
+            preferenceManager.setBooleanPreference(Constants.FIRST_LAUNCH_PREF_KEY, false)
         }
+    }
+}
+
+class OnboardActivityViewModelFactory(private val preferenceManager: IPreferenceManager) : ViewModelProvider.Factory {
+
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        return OnboardActivityViewModel(preferenceManager) as T
     }
 }

@@ -1,27 +1,33 @@
 package com.josycom.mayorjay.genpass.init.splash
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.asLiveData
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.josycom.mayorjay.genpass.persistence.PreferenceManager
-import com.josycom.mayorjay.genpass.persistence.dataStore
+import com.josycom.mayorjay.genpass.persistence.IPreferenceManager
+import com.josycom.mayorjay.genpass.util.Constants
 import kotlinx.coroutines.launch
 
-class SplashViewModel(application: Application) : AndroidViewModel(application) {
+class SplashViewModel(private val preferenceManager: IPreferenceManager) : ViewModel() {
 
-    var preferenceManager: PreferenceManager? = null
     var isFirstLaunch: LiveData<Boolean>? = null
 
     init {
-        preferenceManager = PreferenceManager(application.dataStore)
-        isFirstLaunch = preferenceManager?.getFirstLaunchPrefFlow()?.asLiveData()
+        isFirstLaunch = preferenceManager.getBooleanPreferenceFlow(Constants.FIRST_LAUNCH_PREF_KEY).asLiveData()
     }
 
     fun deletePreferences() {
         viewModelScope.launch {
-            preferenceManager?.deleteAllPreferences()
+            preferenceManager.deleteAllPreferences()
         }
+    }
+}
+
+class SplashViewModelFactory(private val preferenceManager: IPreferenceManager) : ViewModelProvider.Factory {
+
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        return SplashViewModel(preferenceManager) as T
     }
 }

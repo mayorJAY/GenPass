@@ -8,6 +8,8 @@ import androidx.lifecycle.lifecycleScope
 import com.josycom.mayorjay.genpass.R
 import com.josycom.mayorjay.genpass.home.HomeActivity
 import com.josycom.mayorjay.genpass.init.onboard.OnboardActivity
+import com.josycom.mayorjay.genpass.persistence.PreferenceManager
+import com.josycom.mayorjay.genpass.persistence.dataStore
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -16,7 +18,10 @@ class SplashActivity : AppCompatActivity() {
 
     private var isFirstLaunch = true
     private var job: Job? = null
-    private val viewModel: SplashViewModel by viewModels()
+    private val viewModel: SplashViewModel by viewModels {
+        val preferenceManager = PreferenceManager(dataStore)
+        SplashViewModelFactory(preferenceManager)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

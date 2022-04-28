@@ -13,6 +13,8 @@ import com.josycom.mayorjay.genpass.R
 import com.josycom.mayorjay.genpass.data.OnboardData
 import com.josycom.mayorjay.genpass.databinding.ActivityOnboardBinding
 import com.josycom.mayorjay.genpass.home.HomeActivity
+import com.josycom.mayorjay.genpass.persistence.PreferenceManager
+import com.josycom.mayorjay.genpass.persistence.dataStore
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -21,7 +23,10 @@ import kotlin.collections.ArrayList
 class OnboardActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityOnboardBinding
-    private val viewModel: OnboardActivityViewModel by viewModels()
+    private val viewModel: OnboardActivityViewModel by viewModels {
+        val preferenceManager = PreferenceManager(dataStore)
+        OnboardActivityViewModelFactory(preferenceManager)
+    }
     private val dots: ArrayList<ImageView> = ArrayList()
     private var currentPage = 0
     private var job: Job? = null

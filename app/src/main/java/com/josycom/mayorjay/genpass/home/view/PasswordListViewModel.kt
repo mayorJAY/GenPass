@@ -1,19 +1,21 @@
 package com.josycom.mayorjay.genpass.home.view
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.josycom.mayorjay.genpass.data.PasswordData
-import com.josycom.mayorjay.genpass.persistence.PreferenceManager
-import com.josycom.mayorjay.genpass.persistence.dataStore
+import com.josycom.mayorjay.genpass.persistence.IPreferenceManager
 
-class PasswordListViewModel(application: Application) : AndroidViewModel(application) {
+class PasswordListViewModel(val preferenceManager: IPreferenceManager) : ViewModel() {
 
-    var preferenceManager: PreferenceManager? = null
     val tempPasswordList = mutableListOf<PasswordData>()
     val passwordList = MutableLiveData<List<PasswordData>>()
+}
 
-    init {
-        preferenceManager = PreferenceManager(application.dataStore)
+class PasswordListViewModelFactory(private val preferenceManager: IPreferenceManager) : ViewModelProvider.Factory {
+
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        return PasswordListViewModel(preferenceManager) as T
     }
 }

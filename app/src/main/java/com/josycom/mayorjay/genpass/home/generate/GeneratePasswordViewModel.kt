@@ -1,14 +1,13 @@
 package com.josycom.mayorjay.genpass.home.generate
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.josycom.mayorjay.genpass.data.PasswordData
 import com.josycom.mayorjay.genpass.data.getPasswordCharacters
 import com.josycom.mayorjay.genpass.data.getPasswordDisplayTexts
-import com.josycom.mayorjay.genpass.persistence.PreferenceManager
-import com.josycom.mayorjay.genpass.persistence.dataStore
+import com.josycom.mayorjay.genpass.persistence.IPreferenceManager
 import com.josycom.mayorjay.genpass.util.Constants
 import kotlinx.coroutines.launch
 import org.apache.commons.lang3.StringUtils
@@ -16,18 +15,13 @@ import java.security.SecureRandom
 import java.util.LinkedList
 import java.util.Queue
 
-class GeneratePasswordViewModel(application: Application) : AndroidViewModel(application) {
+class GeneratePasswordViewModel(val preferenceManager: IPreferenceManager) : ViewModel() {
 
     val passwordType = MutableLiveData<String>()
     val passwordLength = MutableLiveData<String>()
     val password = MutableLiveData<String>()
     val passwordQueue: Queue<PasswordData> = LinkedList()
-    var preferenceManager: PreferenceManager? = null
     var queueToList = listOf<PasswordData>()
-
-    init {
-        preferenceManager = PreferenceManager(application.dataStore)
-    }
 
     fun getPasswordTypes(): MutableList<String> = getPasswordDisplayTexts()
 
@@ -81,8 +75,16 @@ class GeneratePasswordViewModel(application: Application) : AndroidViewModel(app
         passwordQueue.add(passwordData)
         for (item in passwordQueue) {
             viewModelScope.launch {
-                preferenceManager?.setPasswordPref(item.key, "${item.password}-${item.timeGenerated}")
+                preferenceManager.setStringPreference(item.key, "${item.password}-${item.timeGenerated}")
             }
         }
+    }
+}
+
+class GeneratePasswordViewModelFactory(private val preferenceManager: IPreferenceManager) : ViewModelProvider.Factory {
+
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        return GeneratePasswordViewModel(preferenceManager) as T
     }
 }

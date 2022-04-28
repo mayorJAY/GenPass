@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.josycom.mayorjay.genpass.data.PasswordData
 import com.josycom.mayorjay.genpass.databinding.PasswordListItemBinding
-import com.josycom.mayorjay.genpass.util.Utilities
+import com.josycom.mayorjay.genpass.util.getFormattedDate
 
 class PasswordListAdapter : RecyclerView.Adapter<PasswordListAdapter.PasswordViewHolder>() {
 
@@ -45,7 +45,7 @@ class PasswordListAdapter : RecyclerView.Adapter<PasswordListAdapter.PasswordVie
 
         fun bind(passwordData: PasswordData) {
             binding.apply {
-                tvDate.text = Utilities.getFormattedDate(passwordData.timeGenerated)
+                tvDate.text = passwordData.timeGenerated.getFormattedDate()
                 passwordData.password.apply {
                     tvPassword.text = this
                     ivCopy.tag = this

@@ -2,10 +2,9 @@ package com.josycom.mayorjay.genpass.init.onboard
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.widget.ImageView
 import android.widget.LinearLayout
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
@@ -16,17 +15,22 @@ import com.josycom.mayorjay.genpass.databinding.ActivityOnboardBinding
 import com.josycom.mayorjay.genpass.home.HomeActivity
 import com.josycom.mayorjay.genpass.persistence.PreferenceManager
 import com.josycom.mayorjay.genpass.persistence.dataStore
+import com.josycom.mayorjay.genpass.util.Constants
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.util.Timer
-import java.util.TimerTask
 import kotlin.collections.ArrayList
 
 class OnboardActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityOnboardBinding
+    private val viewModel: OnboardActivityViewModel by viewModels {
+        val preferenceManager = PreferenceManager(dataStore)
+        OnboardActivityViewModelFactory(preferenceManager)
+    }
     private val dots: ArrayList<ImageView> = ArrayList()
     private var currentPage = 0
-    private val timer = Timer()
+    private var job: Job? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,7 +39,8 @@ class OnboardActivity : AppCompatActivity() {
 
         setupViews()
         setupListeners()
-        setPref()
+        enableViewPagerAutoScroll()
+        setLaunchPref()
     }
 
     private fun setupViews() {
@@ -43,13 +48,13 @@ class OnboardActivity : AppCompatActivity() {
             binding.viewPager.adapter = this
         }
 
-        val dotCount = onboardPagerAdapter.itemCount
         val params = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.WRAP_CONTENT,
             LinearLayout.LayoutParams.WRAP_CONTENT
-        )
-        params.setMargins(12, 0, 12, 0)
-        for (i in 0 until dotCount) {
+        ).apply {
+            setMargins(12, 0, 12, 0)
+        }
+        for (i in 0 until onboardPagerAdapter.itemCount) {
             dots.add(ImageView(this).apply {
                 setImageDrawable(resources.getDrawable(R.drawable.non_selected_item_dot, null))
                 binding.viewPagerCounterLayout.addView(this, params)
@@ -62,7 +67,28 @@ class OnboardActivity : AppCompatActivity() {
         binding.btProceed.setOnClickListener {
             navigateToHome()
         }
-        enableViewPagerAutoScroll()
+    }
+
+    private fun enableViewPagerAutoScroll() {
+        job = lifecycleScope.launch {
+            delay(500)
+            while (true) {
+                if (currentPage == dots.size) currentPage = 0
+                binding.viewPager.setCurrentItem(currentPage++, true)
+                delay(2000)
+            }
+        }
+    }
+
+    private fun setLaunchPref() {
+        viewModel.setLaunchPref(Constants.FIRST_LAUNCH_PREF_KEY, false)
+    }
+
+    private fun navigateToHome() {
+        Intent(this, HomeActivity::class.java).apply {
+            startActivity(this)
+        }
+        finish()
     }
 
     private val callback = object: ViewPager2.OnPageChangeCallback() {
@@ -80,13 +106,6 @@ class OnboardActivity : AppCompatActivity() {
                 )
             )
             binding.btProceed.isVisible = (position == dots.lastIndex)
-        }
-    }
-
-    private fun setPref() {
-        val dataStore = PreferenceManager(dataStore)
-        lifecycleScope.launch {
-            dataStore.setFirstLaunchPref(false)
         }
     }
 
@@ -114,28 +133,6 @@ class OnboardActivity : AppCompatActivity() {
             )
         }
 
-    private fun navigateToHome() {
-        val intent = Intent(this, HomeActivity::class.java)
-        startActivity(intent)
-        finish()
-    }
-
-    private fun enableViewPagerAutoScroll() {
-        val handler = Handler(Looper.getMainLooper())
-        val runnable = Runnable {
-            if (currentPage == dots.size) {
-                currentPage = 0
-            }
-            binding.viewPager.setCurrentItem(currentPage++, true)
-        }
-
-        timer.schedule(object: TimerTask() {
-            override fun run() {
-                handler.post(runnable)
-            }
-        }, 500, 2000)
-    }
-
     override fun onStart() {
         super.onStart()
         binding.viewPager.registerOnPageChangeCallback(callback)
@@ -148,6 +145,6 @@ class OnboardActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        timer.cancel()
+        job?.cancel()
     }
 }

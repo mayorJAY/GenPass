@@ -5,7 +5,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.josycom.mayorjay.genpass.data.OnboardData
 
-class OnboardPagerAdapter(fragmentActivity: FragmentActivity, val onboardData: List<OnboardData>) : FragmentStateAdapter(fragmentActivity) {
+class OnboardPagerAdapter(fragmentActivity: FragmentActivity, private val onboardData: List<OnboardData>) : FragmentStateAdapter(fragmentActivity) {
 
     override fun getItemCount(): Int {
         return onboardData.size

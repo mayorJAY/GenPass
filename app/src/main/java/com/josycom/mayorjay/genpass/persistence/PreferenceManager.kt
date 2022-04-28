@@ -8,81 +8,64 @@ import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.josycom.mayorjay.genpass.util.Constants.PREFERENCES_FILE_NAME
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 
-private const val PREFERENCES_FILE_NAME = "gp_preferences"
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
     name = PREFERENCES_FILE_NAME
 )
 
-class PreferenceManager(private val dataStore: DataStore<Preferences>) {
+class PreferenceManager(private val dataStore: DataStore<Preferences>) : IPreferenceManager {
 
-    private val isFirstLaunchPref = booleanPreferencesKey("isFirstLaunch")
-    val list = listOf("password1", "password2", "password3", "password4", "password5", "password6", "password7", "password8", "password9", "password10")
-
-    private fun getBooleanPreferenceFlow(key: Preferences.Key<Boolean>): Flow<Boolean> {
+    override fun getBooleanPreferenceFlow(key: String): Flow<Boolean> {
+        val prefKey: Preferences.Key<Boolean> = booleanPreferencesKey(key)
         return dataStore.data
             .catch { exception ->
                 exception.printStackTrace()
                 emit(emptyPreferences())
             }
             .map { preferences ->
-                preferences[key] ?: true
+                preferences[prefKey] ?: true
             }
     }
 
-    private suspend fun setBooleanPreference(
-        key: Preferences.Key<Boolean>,
+    override suspend fun setBooleanPreference(
+        key: String,
         value: Boolean
     ) {
+        val prefKey: Preferences.Key<Boolean> = booleanPreferencesKey(key)
         dataStore.edit { preferences ->
-            preferences[key] = value
+            preferences[prefKey] = value
         }
     }
 
-    private fun getStringPreferenceFlow(key: Preferences.Key<String>): Flow<String>  {
+    override fun getStringPreferenceFlow(key: String): Flow<String>  {
+        val prefKey: Preferences.Key<String> = stringPreferencesKey(key)
         return dataStore.data
             .catch { exception ->
                 exception.printStackTrace()
                 emit(emptyPreferences())
             }
             .map { preferences ->
-                preferences[key] ?: ""
+                preferences[prefKey] ?: ""
             }
     }
 
-    private suspend fun setStringPreference(
-        key: Preferences.Key<String>,
+    override suspend fun setStringPreference(
+        key: String,
         value: String
     ) {
+        val prefKey: Preferences.Key<String> = stringPreferencesKey(key)
         dataStore.edit { preferences ->
-            preferences[key] = value
+            preferences[prefKey] = value
         }
     }
 
-    suspend fun deleteAllPreferences() {
+    override suspend fun deleteAllPreferences() {
         dataStore.edit { preferences ->
             preferences.clear()
         }
-    }
-
-    fun getFirstLaunchPrefFlow(): Flow<Boolean> {
-        return getBooleanPreferenceFlow(isFirstLaunchPref)
-    }
-
-    suspend fun setFirstLaunchPref(value: Boolean) {
-        setBooleanPreference(isFirstLaunchPref, value)
-    }
-
-    fun getPasswordPrefFlow(key: String): Flow<String> {
-        val passwordPref = stringPreferencesKey(key)
-        return getStringPreferenceFlow(passwordPref)
-    }
-
-    suspend fun setPasswordPref(key: String, value: String) {
-        val passwordPref = stringPreferencesKey(key)
-        setStringPreference(passwordPref, value)
     }
 }

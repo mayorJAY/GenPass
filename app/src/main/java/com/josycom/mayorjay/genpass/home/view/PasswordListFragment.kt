@@ -14,14 +14,18 @@ import com.josycom.mayorjay.genpass.data.PasswordData
 import com.josycom.mayorjay.genpass.databinding.FragmentPasswordListBinding
 import com.josycom.mayorjay.genpass.persistence.PreferenceManager
 import com.josycom.mayorjay.genpass.persistence.dataStore
-import com.josycom.mayorjay.genpass.util.Utilities
+import com.josycom.mayorjay.genpass.util.Constants
+import com.josycom.mayorjay.genpass.util.copyContentToClipboard
+import com.josycom.mayorjay.genpass.util.shareContent
 import org.apache.commons.lang3.StringUtils
 
 class PasswordListFragment : Fragment() {
 
-    private val viewModel: PasswordListViewModel by viewModels()
+    private val viewModel: PasswordListViewModel by viewModels {
+        val preferenceManager = PreferenceManager(requireContext().dataStore)
+        PasswordListViewModelFactory(preferenceManager)
+    }
     private lateinit var binding: FragmentPasswordListBinding
-    private val passwordList = mutableListOf<PasswordData>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,19 +43,18 @@ class PasswordListFragment : Fragment() {
     }
 
     private fun retrievePasswords() {
-        val dataStore = PreferenceManager(requireContext().dataStore)
-        for (item in dataStore.list) {
-            dataStore.getPasswordPrefFlow(item).asLiveData().observe(viewLifecycleOwner, { value ->
-                val iterator = passwordList.listIterator()
+        for (item in Constants.PASSWORD_KEY_LIST) {
+            viewModel.getPasswordPref(item).observe(viewLifecycleOwner, { value ->
+                val iterator = viewModel.tempPasswordList.listIterator()
                 while (iterator.hasNext()) {
                     if (StringUtils.equalsIgnoreCase(iterator.next().key , item)) {
                         iterator.remove()
                     }
                 }
-                if (value != null && StringUtils.isNotBlank(value)) {
-                    passwordList.add(PasswordData(item, value.substringBefore("-"), value.substringAfter("-").toLong()))
-                    passwordList.sortWith { p0, p1 -> (p0?.timeGenerated ?: 0L).compareTo(p1?.timeGenerated ?: 0L) }
-                    viewModel.passwordList.value = passwordList
+                if (StringUtils.isNotBlank(value)) {
+                    viewModel.tempPasswordList.add(PasswordData(item, value.substringBefore("-"), value.substringAfter("-").toLong()))
+                    viewModel.tempPasswordList.sortWith { p0, p1 -> (p0?.timeGenerated ?: 0L).compareTo(p1?.timeGenerated ?: 0L) }
+                    viewModel.passwordList.value = viewModel.tempPasswordList
                 }
             })
         }
@@ -74,11 +77,11 @@ class PasswordListFragment : Fragment() {
 
     private val copyListener = View.OnClickListener { v ->
         val password = v?.tag as String
-        Utilities.copyContentToClipboard(password, requireContext())
+        requireContext().copyContentToClipboard(password)
     }
 
     private val shareListener = View.OnClickListener { v ->
         val password = v?.tag as String
-        Utilities.shareContent(password, requireContext())
+        requireContext().shareContent(password)
     }
 }

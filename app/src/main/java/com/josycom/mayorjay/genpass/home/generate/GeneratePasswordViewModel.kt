@@ -26,28 +26,27 @@ class GeneratePasswordViewModel(val preferenceManager: IPreferenceManager) : Vie
     fun getPasswordTypes(): MutableList<String> = getPasswordDisplayTexts()
 
     fun validateInputs(passwordType: String?, passwordLength: String?): String {
-        if (StringUtils.isBlank(passwordType) || StringUtils.equalsIgnoreCase(passwordType, Constants.PASSWORD_TYPE)) {
-            return Constants.SELECT_PASSWORD_TYPE
+        return when {
+            StringUtils.isBlank(passwordType) || StringUtils.equalsIgnoreCase(passwordType, Constants.PASSWORD_TYPE) -> {
+                Constants.SELECT_PASSWORD_TYPE
+            }
+            StringUtils.isBlank(passwordLength) -> {
+                Constants.SPECIFY_PASSWORD_LENGTH
+            }
+            passwordLength?.toInt() ?: 0 !in 16..64 -> {
+                Constants.INPUT_VALID_PASSWORD_LENGTH
+            }
+            else -> StringUtils.EMPTY
         }
-
-        if (StringUtils.isBlank(passwordLength)) {
-            return Constants.SPECIFY_PASSWORD_LENGTH
-        }
-
-        if (passwordLength?.toInt() ?: 0 < 16 || passwordLength?.toInt() ?: 0 > 64) {
-            return Constants.INPUT_VALID_PASSWORD_LENGTH
-        }
-        return StringUtils.EMPTY
     }
 
     fun generatePassword(passwordType: String?, passwordLength: Int): String {
         val buffer = StringBuffer()
         val characters = getPasswordCharacters(passwordType ?: StringUtils.EMPTY)
-        val charactersLength = characters.length
         val secureRandom = SecureRandom()
         for (i in 0 until passwordLength) {
-            val index = secureRandom.nextInt(charactersLength).toDouble()
-            buffer.append(characters[index.toInt()])
+            val index = secureRandom.nextInt(characters.length)
+            buffer.append(characters[index])
         }
         return buffer.toString()
     }

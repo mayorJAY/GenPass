@@ -11,6 +11,7 @@ import com.josycom.mayorjay.genpass.persistence.IPreferenceManager
 import com.josycom.mayorjay.genpass.util.Constants
 import kotlinx.coroutines.launch
 import org.apache.commons.lang3.StringUtils
+import java.lang.StringBuilder
 import java.security.SecureRandom
 import java.util.LinkedList
 import java.util.Queue
@@ -41,14 +42,14 @@ class GeneratePasswordViewModel(val preferenceManager: IPreferenceManager) : Vie
     }
 
     fun generatePassword(passwordType: String?, passwordLength: Int): String {
-        val buffer = StringBuffer()
+        val builder = StringBuilder()
         val characters = getPasswordCharacters(passwordType ?: StringUtils.EMPTY)
         val secureRandom = SecureRandom()
         for (i in 0 until passwordLength) {
             val index = secureRandom.nextInt(characters.length)
-            buffer.append(characters[index])
+            builder.append(characters[index])
         }
-        return buffer.toString()
+        return builder.toString()
     }
 
     fun getNextAvailableKey(): String {

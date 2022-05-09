@@ -9,5 +9,6 @@ object Constants {
     const val APP_UPDATE = 10
     const val PREFERENCES_FILE_NAME = "gp_preferences"
     const val FIRST_LAUNCH_PREF_KEY = "isFirstLaunch"
+    const val APP_OPEN_COUNT_PREF_KEY = "appOpenCount"
     val PASSWORD_KEY_LIST = listOf("password1", "password2", "password3", "password4", "password5", "password6", "password7", "password8", "password9", "password10")
 }

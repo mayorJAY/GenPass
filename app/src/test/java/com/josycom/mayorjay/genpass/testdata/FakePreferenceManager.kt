@@ -28,6 +28,16 @@ class FakePreferenceManager : IPreferenceManager {
         fakeDataStore[key] = value
     }
 
+    override fun getIntPreferenceFlow(key: String): Flow<Int> {
+        return flow {
+            emit(fakeDataStore[key] as Int)
+        }
+    }
+
+    override suspend fun setIntPreference(key: String, value: Int) {
+        fakeDataStore[key] = value
+    }
+
     override suspend fun deleteAllPreferences() {
         fakeDataStore.clear()
     }

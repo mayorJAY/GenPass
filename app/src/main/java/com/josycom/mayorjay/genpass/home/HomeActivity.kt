@@ -1,11 +1,16 @@
 package com.josycom.mayorjay.genpass.home
 
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.IntentSender
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayoutMediator
@@ -20,13 +25,26 @@ import com.google.android.play.core.install.model.UpdateAvailability
 import com.google.android.play.core.tasks.OnSuccessListener
 import com.josycom.mayorjay.genpass.R
 import com.josycom.mayorjay.genpass.databinding.ActivityHomeBinding
+import com.josycom.mayorjay.genpass.persistence.PreferenceManager
+import com.josycom.mayorjay.genpass.persistence.dataStore
+import com.josycom.mayorjay.genpass.util.Constants
 import com.josycom.mayorjay.genpass.util.Constants.APP_UPDATE
 import com.josycom.mayorjay.genpass.util.showSnackBar
+import com.josycom.mayorjay.genpass.util.showToast
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class HomeActivity : AppCompatActivity() {
 
+    private var appOpenCount = 0
+    private var job: Job? = null
     private lateinit var binding: ActivityHomeBinding
     private var appUpdateManager: AppUpdateManager? = null
+    private val viewModel: HomeViewModel by viewModels {
+        val preferenceManager = PreferenceManager(dataStore)
+        HomeViewModelFactory(preferenceManager)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,7 +52,9 @@ class HomeActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setupViewPager()
-        //Todo: Implement app review prompt
+        getAppOpenCounts()
+        observeAppOpenCount()
+        startJob()
     }
 
     private fun setupViewPager() {
@@ -43,6 +63,45 @@ class HomeActivity : AppCompatActivity() {
         TabLayoutMediator(binding.tabs, binding.viewPager) { tab, position ->
             tab.text = getString(tabTitles[position])
         }.attach()
+    }
+
+    private fun getAppOpenCounts() {
+        viewModel.getAppOpenCounts(Constants.APP_OPEN_COUNT_PREF_KEY)
+    }
+
+    private fun observeAppOpenCount() {
+        viewModel.appOpenCountLiveData?.observe(this, { value ->
+            appOpenCount = value
+        })
+    }
+
+    private fun startJob() {
+        job = lifecycleScope.launch {
+            delay(500)
+            displayAppReviewPrompt()
+        }
+    }
+
+    private fun displayAppReviewPrompt() {
+        val currentAppOpenCount = appOpenCount.plus(1)
+        viewModel.saveAppOpenCounts(Constants.APP_OPEN_COUNT_PREF_KEY, currentAppOpenCount)
+        if (currentAppOpenCount == 5 || currentAppOpenCount == 10) {
+            AlertDialog.Builder(this).apply {
+                setCancelable(false)
+                setMessage(getString(R.string.app_review_msg))
+                setNegativeButton(getString(R.string.i_am_good)) { _: DialogInterface, _: Int -> }
+                setPositiveButton(getString(R.string.i_will_rate)) { _: DialogInterface, _: Int ->
+                    val uri = Uri.parse("market://details?id=$packageName")
+                    val intent = Intent(Intent.ACTION_VIEW, uri)
+                    if (packageManager.queryIntentActivities(intent, 0).size <= 0) {
+                        showToast(getString(R.string.play_store_error))
+                        return@setPositiveButton
+                    }
+                    startActivity(intent)
+                }
+                show()
+            }
+        }
     }
 
     private val callback = object : ViewPager2.OnPageChangeCallback() {
@@ -69,6 +128,11 @@ class HomeActivity : AppCompatActivity() {
     override fun onStop() {
         super.onStop()
         binding.viewPager.unregisterOnPageChangeCallback(callback)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        job?.cancel()
     }
 
     private fun checkForAppUpdate() {

@@ -1,5 +1,7 @@
 package com.josycom.mayorjay.genpass.home.generate
 
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -9,6 +11,7 @@ import com.josycom.mayorjay.genpass.data.getPasswordCharacters
 import com.josycom.mayorjay.genpass.data.getPasswordDisplayTexts
 import com.josycom.mayorjay.genpass.persistence.IPreferenceManager
 import com.josycom.mayorjay.genpass.util.Constants
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import org.apache.commons.lang3.StringUtils
 import java.lang.StringBuilder
@@ -23,6 +26,14 @@ class GeneratePasswordViewModel(val preferenceManager: IPreferenceManager) : Vie
     val password = MutableLiveData<String>()
     val passwordQueue: Queue<PasswordData> = LinkedList()
     var queueToList = listOf<PasswordData>()
+
+    fun getPasswordPref(key: String): LiveData<String?> {
+        return getPasswordPrefFlow(key).asLiveData()
+    }
+
+    private fun getPasswordPrefFlow(key: String): Flow<String?> {
+        return preferenceManager.getStringPreferenceFlow(key)
+    }
 
     fun getPasswordTypes(): MutableList<String> = getPasswordDisplayTexts()
 

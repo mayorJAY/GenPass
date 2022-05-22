@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.asLiveData
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.josycom.mayorjay.genpass.data.PasswordData
@@ -51,7 +50,7 @@ class PasswordListFragment : Fragment() {
                         iterator.remove()
                     }
                 }
-                if (StringUtils.isNotBlank(value)) {
+                if (value != null && StringUtils.isNotBlank(value)) {
                     viewModel.tempPasswordList.add(PasswordData(item, value.substringBefore("-"), value.substringAfter("-").toLong()))
                     viewModel.tempPasswordList.sortWith { p0, p1 -> (p0?.timeGenerated ?: 0L).compareTo(p1?.timeGenerated ?: 0L) }
                     viewModel.passwordList.value = viewModel.tempPasswordList

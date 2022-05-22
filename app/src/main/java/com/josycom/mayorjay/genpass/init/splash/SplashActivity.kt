@@ -40,7 +40,7 @@ class SplashActivity : AppCompatActivity() {
 
     private fun observeLaunchPref() {
         viewModel.isFirstLaunch?.observe(this, { value ->
-            isFirstLaunch = value
+            isFirstLaunch = value ?: true
         })
     }
 

@@ -6,14 +6,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.josycom.mayorjay.genpass.persistence.IPreferenceManager
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 class HomeViewModel(private val preferenceManager: IPreferenceManager) : ViewModel() {
 
-    var appOpenCountLiveData: LiveData<Int>? = null
+    var appOpenCountLiveData: LiveData<Int?>? = null
 
-    fun getAppOpenCounts(key: String) {
-        appOpenCountLiveData = preferenceManager.getIntPreferenceFlow(key).asLiveData()
+    fun getAppOpenCountPref(key: String): Flow<Int?> {
+        return preferenceManager.getIntPreferenceFlow(key).apply {
+            appOpenCountLiveData = this.asLiveData()
+        }
     }
 
     fun saveAppOpenCounts(key: String, value: Int) {

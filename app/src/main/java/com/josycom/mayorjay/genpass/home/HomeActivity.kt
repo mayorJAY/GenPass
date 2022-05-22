@@ -5,7 +5,6 @@ import android.content.Intent
 import android.content.IntentSender
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -34,6 +33,7 @@ import com.josycom.mayorjay.genpass.util.showToast
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class HomeActivity : AppCompatActivity() {
 
@@ -66,12 +66,12 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun getAppOpenCounts() {
-        viewModel.getAppOpenCounts(Constants.APP_OPEN_COUNT_PREF_KEY)
+        viewModel.getAppOpenCountPref(Constants.APP_OPEN_COUNT_PREF_KEY)
     }
 
     private fun observeAppOpenCount() {
         viewModel.appOpenCountLiveData?.observe(this, { value ->
-            appOpenCount = value
+            appOpenCount = value ?: 0
         })
     }
 
@@ -151,7 +151,7 @@ class HomeActivity : AppCompatActivity() {
                     appUpdateManager?.unregisterListener(this)
                 }
                 else -> {
-                    Log.i("UpdateInstaller", "InstallStateUpdatedListener >>>>> ${state.installStatus()}")
+                    Timber.i("UpdateInstaller InstallStateUpdatedListener >>>>> ${state.installStatus()}")
                 }
             }
         }
@@ -162,12 +162,12 @@ class HomeActivity : AppCompatActivity() {
             try {
                 appUpdateManager?.startUpdateFlowForResult(appUpdateInfo, AppUpdateType.FLEXIBLE, this, APP_UPDATE)
             } catch (e: IntentSender.SendIntentException) {
-                e.printStackTrace()
+                Timber.e(e)
             }
         } else if (appUpdateInfo?.installStatus() == InstallStatus.DOWNLOADED) {
             popupSnackBarForDownloadedUpdate()
         } else {
-            Log.i("UpdateInstaller", "OnSuccessListener >>>>> ${appUpdateInfo?.installStatus()}")
+            Timber.i("UpdateInstaller OnSuccessListener >>>>> ${appUpdateInfo?.installStatus()}")
         }
     }
 

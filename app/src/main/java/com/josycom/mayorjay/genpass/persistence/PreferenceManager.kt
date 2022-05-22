@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import org.apache.commons.lang3.StringUtils
+import timber.log.Timber
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
     name = PREFERENCES_FILE_NAME
@@ -21,11 +22,11 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
 
 class PreferenceManager(private val dataStore: DataStore<Preferences>) : IPreferenceManager {
 
-    override fun getBooleanPreferenceFlow(key: String): Flow<Boolean> {
+    override fun getBooleanPreferenceFlow(key: String): Flow<Boolean?> {
         val prefKey: Preferences.Key<Boolean> = booleanPreferencesKey(key)
         return dataStore.data
             .catch { exception ->
-                exception.printStackTrace()
+                Timber.e(exception)
                 emit(emptyPreferences())
             }
             .map { preferences ->
@@ -43,11 +44,11 @@ class PreferenceManager(private val dataStore: DataStore<Preferences>) : IPrefer
         }
     }
 
-    override fun getStringPreferenceFlow(key: String): Flow<String> {
+    override fun getStringPreferenceFlow(key: String): Flow<String?> {
         val prefKey: Preferences.Key<String> = stringPreferencesKey(key)
         return dataStore.data
             .catch { exception ->
-                exception.printStackTrace()
+                Timber.e(exception)
                 emit(emptyPreferences())
             }
             .map { preferences ->
@@ -65,11 +66,11 @@ class PreferenceManager(private val dataStore: DataStore<Preferences>) : IPrefer
         }
     }
 
-    override fun getIntPreferenceFlow(key: String): Flow<Int> {
+    override fun getIntPreferenceFlow(key: String): Flow<Int?> {
         val prefKey: Preferences.Key<Int> = intPreferencesKey(key)
         return dataStore.data
             .catch { exception ->
-                exception.printStackTrace()
+                Timber.e(exception)
                 emit(emptyPreferences())
             }
             .map { preferences ->

@@ -17,7 +17,7 @@
     <string name="emoji_display">&#128542;</string>
     <string name="update_downloaded">An update has just been downloaded</string>
     <string name="restart">Restart</string>
-    <string name="app_review_msg">Hey, it looks like you\'re a frequent user of GenPass! If you have a couple seconds, please rate this app in the Play Store. Every rating goes a long way towards motivating me to continue improving the app!</string>
+    <string name="app_review_msg">Hey, it looks like you\'re a frequent user of GenPass! If you have a couple seconds, please rate this app on Play Store. Every rating goes a long way towards motivating me to continue improving the app!</string>
     <string name="i_will_rate">Sure, I\'ll Rate</string>
     <string name="i_am_good">No, I\'m Good</string>
     <string name="play_store_error">Unable to open the Play Store</string>

@@ -13,7 +13,6 @@ import android.widget.ArrayAdapter
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.asLiveData
 import com.josycom.mayorjay.genpass.R
 import com.josycom.mayorjay.genpass.data.PasswordData
 import com.josycom.mayorjay.genpass.databinding.FragmentGeneratePasswordBinding
@@ -53,7 +52,7 @@ class GeneratePasswordFragment : Fragment() {
 
     private fun observePasswordPref() {
         for (key in Constants.PASSWORD_KEY_LIST) {
-            viewModel.preferenceManager.getStringPreferenceFlow(key).asLiveData().observe(
+            viewModel.getPasswordPref(key).observe(
                 viewLifecycleOwner,
                 { value ->
                     viewModel.queueToList = viewModel.passwordQueue.toList()
@@ -61,7 +60,7 @@ class GeneratePasswordFragment : Fragment() {
                     for (item in viewModel.queueToList) {
                         passList.add("${item.password}-${item.timeGenerated}")
                     }
-                    if (StringUtils.isNotBlank(value) && !passList.contains(value)) {
+                    if (value != null && StringUtils.isNotBlank(value) && !passList.contains(value)) {
                         viewModel.passwordQueue.add(
                             PasswordData(
                                 key, value.substringBefore("-"), value.substringAfter(

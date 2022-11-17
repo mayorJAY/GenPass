@@ -1,8 +1,9 @@
 package com.josycom.mayorjay.genpass.home
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.josycom.mayorjay.genpass.home.view.PasswordListViewModel
-import com.josycom.mayorjay.genpass.testdata.FakePreferenceManager
+import com.josycom.mayorjay.genpass.viewmodel.PasswordListViewModel
+import com.josycom.mayorjay.genpass.testdata.FakePreferenceDataSource
+import com.josycom.mayorjay.genpass.testdata.FakeRepository
 import junit.framework.TestCase
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -13,11 +14,14 @@ class PasswordListViewModelTest : TestCase() {
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
     private lateinit var sut: PasswordListViewModel
-    private var preferenceManager = FakePreferenceManager()
+    private lateinit var dataSource: FakePreferenceDataSource
+    private lateinit var repository: FakeRepository
     private var testResult: String? = null
 
     override fun setUp() {
-        sut = PasswordListViewModel(preferenceManager)
+        dataSource = FakePreferenceDataSource()
+        repository = FakeRepository(dataSource)
+        sut = PasswordListViewModel(repository)
     }
 
     fun `test getPasswordPrefFlow pass_any_key_not_previously_saved null should be returned`() {
@@ -38,7 +42,7 @@ class PasswordListViewModelTest : TestCase() {
     }
 
     private fun saveData(key: String, value: String) = runBlocking {
-        preferenceManager.setStringPreference(key, value)
+        repository.setStringPreference(key, value)
     }
 
     private fun getData(key: String) = runBlocking {

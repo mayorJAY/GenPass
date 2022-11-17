@@ -1,8 +1,9 @@
 package com.josycom.mayorjay.genpass.init
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.josycom.mayorjay.genpass.init.splash.SplashViewModel
-import com.josycom.mayorjay.genpass.testdata.FakePreferenceManager
+import com.josycom.mayorjay.genpass.viewmodel.SplashViewModel
+import com.josycom.mayorjay.genpass.testdata.FakePreferenceDataSource
+import com.josycom.mayorjay.genpass.testdata.FakeRepository
 import junit.framework.TestCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -19,13 +20,16 @@ class SplashViewModelTest : TestCase() {
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
     private lateinit var sut: SplashViewModel
-    private var preferenceManager = FakePreferenceManager()
+    private lateinit var dataSource: FakePreferenceDataSource
+    private lateinit var repository: FakeRepository
     private var testResult: Boolean? = null
     private val dispatcher = TestCoroutineDispatcher()
 
     override fun setUp() {
         Dispatchers.setMain(dispatcher)
-        sut = SplashViewModel(preferenceManager)
+        dataSource = FakePreferenceDataSource()
+        repository = FakeRepository(dataSource)
+        sut = SplashViewModel(repository)
     }
 
     override fun tearDown() {
@@ -55,11 +59,11 @@ class SplashViewModelTest : TestCase() {
         saveData("tea", false)
         saveData("bcd", true)
         sut.deletePreferences()
-        assertTrue(preferenceManager.isEmpty())
+        assertTrue(repository.isEmpty())
     }
 
     private fun saveData(key: String, value: Boolean) = runBlocking {
-        preferenceManager.setBooleanPreference(key, value)
+        repository.setBooleanPreference(key, value)
     }
 
     private fun getData(key: String) = runBlocking {

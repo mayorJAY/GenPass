@@ -1,9 +1,10 @@
 package com.josycom.mayorjay.genpass.home
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.josycom.mayorjay.genpass.data.getPasswordCharacters
-import com.josycom.mayorjay.genpass.home.generate.GeneratePasswordViewModel
-import com.josycom.mayorjay.genpass.testdata.FakePreferenceManager
+import com.josycom.mayorjay.genpass.data.models.getPasswordCharacters
+import com.josycom.mayorjay.genpass.viewmodel.GeneratePasswordViewModel
+import com.josycom.mayorjay.genpass.testdata.FakePreferenceDataSource
+import com.josycom.mayorjay.genpass.testdata.FakeRepository
 import com.josycom.mayorjay.genpass.util.Constants
 import com.josycom.mayorjay.genpass.util.getFormattedDate
 import junit.framework.TestCase
@@ -16,10 +17,13 @@ class GeneratePasswordViewModelTest : TestCase() {
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
     private lateinit var sut: GeneratePasswordViewModel
-    private var preferenceManager = FakePreferenceManager()
+    private lateinit var dataSource: FakePreferenceDataSource
+    private lateinit var repository: FakeRepository
 
     override fun setUp() {
-        sut = GeneratePasswordViewModel(preferenceManager)
+        dataSource = FakePreferenceDataSource()
+        repository = FakeRepository(dataSource)
+        sut = GeneratePasswordViewModel(repository)
     }
 
     fun `test getPasswordTypes should return a non empty list of PasswordTypes`() {

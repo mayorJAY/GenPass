@@ -1,7 +1,9 @@
 package com.josycom.mayorjay.genpass.home
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.josycom.mayorjay.genpass.testdata.FakePreferenceManager
+import com.josycom.mayorjay.genpass.testdata.FakePreferenceDataSource
+import com.josycom.mayorjay.genpass.testdata.FakeRepository
+import com.josycom.mayorjay.genpass.viewmodel.HomeViewModel
 import junit.framework.TestCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -18,13 +20,16 @@ class HomeViewModelTest : TestCase() {
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
     private lateinit var sut: HomeViewModel
-    private var preferenceManager = FakePreferenceManager()
+    private lateinit var dataSource: FakePreferenceDataSource
+    private lateinit var repository: FakeRepository
     private var testResult: Int? = null
     private val dispatcher = TestCoroutineDispatcher()
 
     override fun setUp() {
         Dispatchers.setMain(dispatcher)
-        sut = HomeViewModel(preferenceManager)
+        dataSource = FakePreferenceDataSource()
+        repository = FakeRepository(dataSource)
+        sut = HomeViewModel(repository)
     }
 
     override fun tearDown() {

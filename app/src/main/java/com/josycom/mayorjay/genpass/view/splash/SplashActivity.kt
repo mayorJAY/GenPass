@@ -5,6 +5,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.viewModels
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import com.josycom.mayorjay.genpass.R
 import com.josycom.mayorjay.genpass.viewmodel.SplashViewModel
@@ -31,10 +32,12 @@ class SplashActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
 
 //        viewModel.deletePreferences()
+        splashScreen.setKeepOnScreenCondition { true }
         getLaunchPref()
         observeLaunchPref()
         startJob()
@@ -52,7 +55,7 @@ class SplashActivity : AppCompatActivity() {
 
     private fun startJob() {
         job = lifecycleScope.launch {
-            delay(1500)
+            delay(1000)
             proceedToNextView()
         }
     }
